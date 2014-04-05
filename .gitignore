@@ -23,6 +23,8 @@
 # Temporary files
 *~
 .*.swp
+/externals
+/build
 
 # CMake files
 CMakeCache.txt
