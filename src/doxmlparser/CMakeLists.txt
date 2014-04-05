@@ -1,7 +1,8 @@
 
 set (DOXMLPARSER_LIBRARY doxmlparser)
 
-set (DOXMLPARSER_CXX_FLAGS -pipe -fsigned-char -D_LARGEFILE_SOURCE -Wall -W -O2)
+#set (DOXMLPARSER_CXX_FLAGS "-pipe -fsigned-char -D_LARGEFILE_SOURCE -Wall -W -O2")
+set (DOXMLPARSER_CXX_FLAGS -pipe -fsigned-char -Wall -W -O2)
 
 set (
   DOXMLPARSER_HEADERS
@@ -36,13 +37,10 @@ set (
 
 add_library (${DOXMLPARSER_LIBRARY} ${DOXMLPARSER_SOURCES} ${DOXMLPARSER_HEADERS})
 
-#set_source_files_properties (
-#  ${DOXMLPARSER_SOURCES}
-#  PROPERTIES
-#  COMPILE_FLAGS "${DOXMLPARSER_CXX_FLAGS}"
-#)
-
-message (STATUS ${DOXMLPARSER_LIBRARY})
+target_compile_options (
+  ${DOXMLPARSER_LIBRARY}
+  PUBLIC ${DOXMLPARSER_CXX_FLAGS}
+)
 
 target_include_directories (
   ${DOXMLPARSER_LIBRARY}
