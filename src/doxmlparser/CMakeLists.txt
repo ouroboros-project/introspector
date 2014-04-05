@@ -1,8 +1,7 @@
 
 set (DOXMLPARSER_LIBRARY doxmlparser)
 
-#set (DOXMLPARSER_CXX_FLAGS "-pipe -fsigned-char -D_LARGEFILE_SOURCE -Wall -W -O2")
-set (DOXMLPARSER_CXX_FLAGS -pipe -fsigned-char -Wall -W -O2)
+set (DOXMLPARSER_CXX_FLAGS -pipe -fsigned-char -D_LARGEFILE_SOURCE -Wall -W -O2)
 
 set (
   DOXMLPARSER_HEADERS
