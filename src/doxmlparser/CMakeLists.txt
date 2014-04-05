@@ -1,10 +1,9 @@
 
-set (DOXMLPARSER_LIBRARY doxmlparser)
 
-set (DOXMLPARSER_CXX_FLAGS -pipe -fsigned-char -D_LARGEFILE_SOURCE -Wall -W -O2)
+set (OP_DOXMLPARSER_CXX_FLAGS -pipe -fsigned-char -D_LARGEFILE_SOURCE -Wall -W -O2)
 
 set (
-  DOXMLPARSER_HEADERS
+  OP_DOXMLPARSER_HEADERS
   basehandler.h
   mainhandler.h
   compoundhandler.h
@@ -20,7 +19,7 @@ set (
 )
 
 set (
-  DOXMLPARSER_SOURCES
+  OP_DOXMLPARSER_SOURCES
   mainhandler.cpp
   compoundhandler.cpp
   sectionhandler.cpp
@@ -34,16 +33,16 @@ set (
   loamhandler.cpp
 )
 
-add_library (${DOXMLPARSER_LIBRARY} ${DOXMLPARSER_SOURCES} ${DOXMLPARSER_HEADERS})
+add_library (${OP_DOXMLPARSER_LIBRARY} ${OP_DOXMLPARSER_SOURCES} ${OP_DOXMLPARSER_HEADERS})
 
 target_compile_options (
-  ${DOXMLPARSER_LIBRARY}
-  PUBLIC  ${DOXMLPARSER_CXX_FLAGS}
-  PRIVATE ${DOXMLPARSER_CXX_FLAGS}
+  ${OP_DOXMLPARSER_LIBRARY}
+  PUBLIC  ${OP_DOXMLPARSER_CXX_FLAGS}
+  PRIVATE ${OP_DOXMLPARSER_CXX_FLAGS}
 )
 
 target_include_directories (
-  ${DOXMLPARSER_LIBRARY}
+  ${OP_DOXMLPARSER_LIBRARY}
   PUBLIC  ${OP_QTOOLS_DIR} ${OP_DOXMLPARSER_DIR}
   PRIVATE ${OP_QTOOLS_DIR} ${OP_DOXMLPARSER_DIR}
 )
