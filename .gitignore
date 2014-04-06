@@ -25,6 +25,7 @@
 .*.swp
 /externals
 /build
+/drafts
 
 # CMake files
 CMakeCache.txt
