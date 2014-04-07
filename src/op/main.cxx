@@ -21,7 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <list>
 #include <doxmlintf.h>
+#include <compoundnode.h>
 
 bool isDocumented(IDocRoot *brief,IDocRoot *detailed)
 {

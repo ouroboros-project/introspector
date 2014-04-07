@@ -1,7 +1,13 @@
 
 set (OP_INTROSPECTOR_EXECUTABLE introspector)
 
-add_executable (${OP_INTROSPECTOR_EXECUTABLE} main.cxx)
+set (OP_INTROSPECTOR_CXX_FLAGS -Wall -W -O2 -std=c++11)
+
+add_executable (
+  ${OP_INTROSPECTOR_EXECUTABLE}
+  compoundnode.h
+  main.cxx
+)
 
 target_link_libraries (
   ${OP_INTROSPECTOR_EXECUTABLE}
@@ -9,10 +15,16 @@ target_link_libraries (
   ${OP_QTOOLS_LIBRARY}
 )
 
+target_compile_options (
+  ${OP_INTROSPECTOR_EXECUTABLE}
+  PUBLIC  ${OP_INTROSPECTOR_CXX_FLAGS}
+  PRIVATE ${OP_INTROSPECTOR_CXX_FLAGS}
+)
+
 target_include_directories (
   ${OP_INTROSPECTOR_EXECUTABLE}
   PUBLIC  ${OP_QTOOLS_LIBRARY} ${OP_DOXMLPARSER_DIR}
-  PRIVATE ${OP_QTOOLS_LIBRARY} ${OP_DOXMLPARSER_DIR}
+  PRIVATE ${OP_QTOOLS_LIBRARY} ${OP_DOXMLPARSER_DIR} ${OP_SOURCE_DIR}
 )
 
 

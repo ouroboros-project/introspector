@@ -9,5 +9,7 @@ set (OP_DOXMLPARSER_LIBRARY doxmlparser)
 
 add_subdirectory (doxmlparser)
 
+set (OP_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/op")
+
 add_subdirectory (op)
 
