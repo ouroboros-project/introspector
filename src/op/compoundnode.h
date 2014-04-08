@@ -23,13 +23,15 @@ class CompoundNode final {
 
     void AddChild (const CompoundNodePtr& the_child);
 
-    auto begin () -> decltype(children_.begin());
-    auto end () -> decltype(children_.end());
-
   private:
 
     ICompound *compound_;
     CompoundNodeList children_;
+
+  public:
+
+    auto begin () -> decltype(children_.begin());
+    auto end () -> decltype(children_.end());
 
 };
 
