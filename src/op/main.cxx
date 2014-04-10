@@ -18,12 +18,16 @@
  *  the doxmlparser library. The example shows some very basic code metrics.
  */
 
+#include <doxmlintf.h>
+#include <op/compoundnode.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
 #include <list>
-#include <doxmlintf.h>
-#include <compoundnode.h>
+
+using op::intro::CompoundNode;
 
 bool isDocumented(IDocRoot *brief,IDocRoot *detailed)
 {
@@ -83,6 +87,7 @@ int main(int argc,char **argv)
   int numParams=0;
   
   IDoxygen *dox = createObjectModel();
+  CompoundNode::Ptr root(new CompoundNode(""));
 
   dox->setDebugLevel(0);
 
@@ -94,133 +99,144 @@ int main(int argc,char **argv)
 
   ICompoundIterator *cli = dox->compounds();
   ICompound *comp;
-  for (cli->toFirst();(comp=cli->current());cli->toNext())
   {
-    printf("Processing %s...\n",comp->name()->latin1());
-    bool hasDocs = isDocumented(comp->briefDescription(),comp->detailedDescription());
-    switch (comp->kind())
+    CompoundNode::Ptr root(new CompoundNode(""));
+    for (cli->toFirst();(comp=cli->current());cli->toNext())
     {
-      case ICompound::Class:      
-        numClasses++;    
-        if (hasDocs) numDocClasses++;
-        break;
-      case ICompound::Struct:     numStructs++;    break;
-      case ICompound::Union:      numUnions++;     break;
-      case ICompound::Interface:  numInterfaces++; break;
-      case ICompound::Exception:  numExceptions++; break;
-      case ICompound::Namespace:  numNamespaces++; break;
-      case ICompound::File:       numFiles++;      break;
-      case ICompound::Group:      numGroups++;     break;
-      case ICompound::Page:       numPages++;      break;
-      default: break;
-    }
-    
-    ISectionIterator *sli = comp->sections();
-    ISection *sec;
-    for (sli->toFirst();(sec=sli->current());sli->toNext())
-    {
-      IMemberIterator *mli = sec->members();
-      IMember *mem;
-      for (mli->toFirst();(mem=mli->current());mli->toNext())
+      printf("Processing %s...\n",comp->name()->latin1());
+      bool hasDocs = isDocumented(comp->briefDescription(),comp->detailedDescription());
+      bool isCodeEntity = false;
+      switch (comp->kind())
       {
-        IParamIterator *pli = mem->parameters();
-        IParam *par;
-        if (comp->kind()==ICompound::Class || 
-            comp->kind()==ICompound::Struct ||
-            comp->kind()==ICompound::Interface
-           )
-        {
-          if (mem->kind()==IMember::Function ||
-              mem->kind()==IMember::Prototype ||
-              mem->kind()==IMember::Signal ||
-              mem->kind()==IMember::Slot ||
-              mem->kind()==IMember::DCOP
-             ) // is a "method"
-          {
-            if (mem->section()->isPublic())
-            {
-              numPubMethods++;
-              if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
-              {
-                numDocPubMethods++;
-              }
-            }
-            else if (mem->section()->isProtected())
-            {
-              numProMethods++;
-              if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
-              {
-                numDocProMethods++;
-              }
-            }
-            else if (mem->section()->isPrivate())
-            {
-              numPriMethods++;
-              if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
-              {
-                numDocPriMethods++;
-              }
-            }
-          }
-          else if (mem->kind()==IMember::Variable || 
-                   mem->kind()==IMember::Property
-                  ) // is an "attribute"
-          {
-            numAttributes++;
-            if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
-            {
-              numDocAttributes++;
-            }
-          }
-        }
-        else if (comp->kind()==ICompound::File ||
-                 comp->kind()==ICompound::Namespace
-                )
-        {
-          if (mem->kind()==IMember::Function ||
-              mem->kind()==IMember::Prototype ||
-              mem->kind()==IMember::Signal ||
-              mem->kind()==IMember::Slot ||
-              mem->kind()==IMember::DCOP
-             ) // is a "method"
-          {
-            numFunctions++;
-            if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
-            {
-              numDocFunctions++;
-            }
-          }
-          else if (mem->kind()==IMember::Variable || 
-                   mem->kind()==IMember::Property
-                  ) // is an "attribute"
-          {
-            numVariables++;
-            if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
-            {
-              numDocVariables++;
-            }
-          }
-        }
-        
-        for (pli->toFirst();(par=pli->current());pli->toNext())
-        {
-          numParams++;
-        }
-        const char *type = mem->typeString()->latin1();
-        if (type && strcmp(type, "void"))
-        {
-          numParams++; // count non-void return types as well
-        }
-        pli->release();
+        case ICompound::Class:
+          numClasses++;    
+          isCodeEntity = true;
+          if (hasDocs) numDocClasses++;
+          break;
+        case ICompound::Struct:     numStructs++;     isCodeEntity = true;  break;
+        case ICompound::Union:      numUnions++;      isCodeEntity = true;  break;
+        case ICompound::Interface:  numInterfaces++;  isCodeEntity = true;  break;
+        case ICompound::Exception:  numExceptions++;  isCodeEntity = true;  break;
+        case ICompound::Namespace:  numNamespaces++;  isCodeEntity = true;  break;
+        case ICompound::File:       numFiles++;       isCodeEntity = false; break;
+        case ICompound::Group:      numGroups++;      isCodeEntity = false; break;
+        case ICompound::Page:       numPages++;       isCodeEntity = false; break;
+        default: break;
       }
-      mli->release();
+
+      if (isCodeEntity)
+        root->AddChild(comp);
+      
+      ISectionIterator *sli = comp->sections();
+      ISection *sec;
+      for (sli->toFirst();(sec=sli->current());sli->toNext())
+      {
+        IMemberIterator *mli = sec->members();
+        IMember *mem;
+        for (mli->toFirst();(mem=mli->current());mli->toNext())
+        {
+          IParamIterator *pli = mem->parameters();
+          IParam *par;
+          if (comp->kind()==ICompound::Class || 
+              comp->kind()==ICompound::Struct ||
+              comp->kind()==ICompound::Interface
+             )
+          {
+            if (mem->kind()==IMember::Function ||
+                mem->kind()==IMember::Prototype ||
+                mem->kind()==IMember::Signal ||
+                mem->kind()==IMember::Slot ||
+                mem->kind()==IMember::DCOP
+               ) // is a "method"
+            {
+              if (mem->section()->isPublic())
+              {
+                numPubMethods++;
+                if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
+                {
+                  numDocPubMethods++;
+                }
+              }
+              else if (mem->section()->isProtected())
+              {
+                numProMethods++;
+                if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
+                {
+                  numDocProMethods++;
+                }
+              }
+              else if (mem->section()->isPrivate())
+              {
+                numPriMethods++;
+                if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
+                {
+                  numDocPriMethods++;
+                }
+              }
+            }
+            else if (mem->kind()==IMember::Variable || 
+                     mem->kind()==IMember::Property
+                    ) // is an "attribute"
+            {
+              numAttributes++;
+              if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
+              {
+                numDocAttributes++;
+              }
+            }
+          }
+          else if (comp->kind()==ICompound::File ||
+                   comp->kind()==ICompound::Namespace
+                  )
+          {
+            if (mem->kind()==IMember::Function ||
+                mem->kind()==IMember::Prototype ||
+                mem->kind()==IMember::Signal ||
+                mem->kind()==IMember::Slot ||
+                mem->kind()==IMember::DCOP
+               ) // is a "method"
+            {
+              numFunctions++;
+              if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
+              {
+                numDocFunctions++;
+              }
+            }
+            else if (mem->kind()==IMember::Variable || 
+                     mem->kind()==IMember::Property
+                    ) // is an "attribute"
+            {
+              numVariables++;
+              if (isDocumented(mem->briefDescription(),mem->detailedDescription()))
+              {
+                numDocVariables++;
+              }
+            }
+          }
+          
+          for (pli->toFirst();(par=pli->current());pli->toNext())
+          {
+            numParams++;
+          }
+          const char *type = mem->typeString()->latin1();
+          if (type && strcmp(type, "void"))
+          {
+            numParams++; // count non-void return types as well
+          }
+          pli->release();
+        }
+        mli->release();
+      }
+      sli->release();
+
+      if (!isCodeEntity)
+        comp->release();
     }
-    sli->release();
 
-    comp->release();
+    root->DumpTree(std::cout);
   }
-  cli->release();
 
+  cli->release();
   dox->release();
 
   int numMethods    = numPubMethods+numProMethods+numPriMethods;

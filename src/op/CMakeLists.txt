@@ -6,6 +6,7 @@ set (OP_INTROSPECTOR_CXX_FLAGS -Wall -W -O2 -std=c++11)
 add_executable (
   ${OP_INTROSPECTOR_EXECUTABLE}
   compoundnode.h
+  compoundnode.cxx
   main.cxx
 )
 

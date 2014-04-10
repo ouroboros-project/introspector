@@ -3,59 +3,73 @@
 #define OP_INTROSPECTOR_COMPOUNDNODE_H_
 
 #include <memory>
+#include <string>
+#include <map>
+#include <ostream>
 
 class ICompound;
 
 namespace op {
 namespace intro {
 
-class CompoundNode final {
+class CompoundNode final : public std::enable_shared_from_this<CompoundNode> {
 
   public:
 
-    using CompoundNodePtr = std::shared_ptr<CompoundNode>;
-    using CompoundNodeList = std::list<CompoundNodePtr>;
+    using Ptr = std::shared_ptr<CompoundNode>;
+    using Table = std::map<std::string, Ptr>;
 
-    CompoundNode ();
+    CompoundNode (const std::string& the_name);
+    ~CompoundNode ();
 
+    const std::string& name () const;
     void set_compound (ICompound *the_compound);
-    ICompound* compound () const;
+    const ICompound* compound () const;
 
-    void AddChild (const CompoundNodePtr& the_child);
+    void AddChild (const Ptr& the_child);
+
+    void AddChild (ICompound* the_child_compound);
+
+    Ptr FindChild (const std::string& the_name) const;
+
+    void DumpTree (std::ostream& out, const std::string& ident = "") const;
 
   private:
 
-    ICompound *compound_;
-    CompoundNodeList children_;
+    const std::string name_;
+    ICompound         *compound_;
+    Table             children_;
 
   public:
 
-    auto begin () -> decltype(children_.begin());
-    auto end () -> decltype(children_.end());
+    auto begin () const -> decltype(children_.begin());
+    auto end () const -> decltype(children_.end());
 
 };
 
-CompoundNode::CompoundNode ()
-  : compound_(nullptr) {}
+inline CompoundNode::CompoundNode (const std::string& the_name)
+  : name_(the_name), compound_(nullptr) {}
 
-void CompoundNode::set_compound (ICompound *the_compound) {
+inline void CompoundNode::set_compound (ICompound *the_compound) {
   // FIXME: should not allow the compound pointer to change after it's been set.
+  // FIXME: should not allow a compound with a name different from that of the
+  //        node.
   compound_ = the_compound;
 }
 
-ICompound* CompoundNode::compound () const {
+inline const std::string& CompoundNode::name () const {
+  return name_;
+}
+
+inline const ICompound* CompoundNode::compound () const {
   return compound_;
 }
 
-void CompoundNode::AddChild (const CompoundNodePtr& the_child) {
-  children_.push_back(the_child);
-}
-
-auto CompoundNode::begin () -> decltype(children_.begin()) {
+inline auto CompoundNode::begin () const -> decltype(children_.begin()) {
   return children_.begin();
 }
 
-auto CompoundNode::end () -> decltype(children_.end()) {
+inline auto CompoundNode::end () const -> decltype(children_.end()) {
   return children_.end();
 }
 
