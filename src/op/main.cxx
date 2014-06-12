@@ -229,8 +229,7 @@ int main(int argc,char **argv)
       }
       sli->release();
 
-      if (!isCodeEntity)
-        comp->release();
+      comp->release();
     }
 
     root->DumpTree(std::cout);

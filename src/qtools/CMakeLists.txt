@@ -2,7 +2,7 @@
 set (
   OP_QTOOLS_CXX_FLAGS
   -pipe -fsigned-char -DQT_LITE_UNICODE -D_LARGEFILE_SOURCE
-  -Wall -W -O2
+  ${OP_INTROSPECTOR_CXX_FLAGS}
 )
 
 set (

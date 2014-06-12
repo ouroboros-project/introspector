@@ -20,11 +20,11 @@ class CompoundNode final : public std::enable_shared_from_this<CompoundNode> {
     using Table = std::map<std::string, Ptr>;
 
     CompoundNode (const std::string& the_name);
-    ~CompoundNode ();
 
     const std::string& name () const;
-    void set_compound (ICompound *the_compound);
-    const ICompound* compound () const;
+    bool ok () const;
+
+    void Check (const ICompound* the_name);
 
     void AddChild (const Ptr& the_child);
 
@@ -37,7 +37,8 @@ class CompoundNode final : public std::enable_shared_from_this<CompoundNode> {
   private:
 
     const std::string name_;
-    ICompound         *compound_;
+    std::string       type_;
+    bool              ok_;
     Table             children_;
 
   public:
@@ -48,21 +49,14 @@ class CompoundNode final : public std::enable_shared_from_this<CompoundNode> {
 };
 
 inline CompoundNode::CompoundNode (const std::string& the_name)
-  : name_(the_name), compound_(nullptr) {}
-
-inline void CompoundNode::set_compound (ICompound *the_compound) {
-  // FIXME: should not allow the compound pointer to change after it's been set.
-  // FIXME: should not allow a compound with a name different from that of the
-  //        node.
-  compound_ = the_compound;
-}
+  : name_(the_name), type_(""), ok_(false) {}
 
 inline const std::string& CompoundNode::name () const {
   return name_;
 }
 
-inline const ICompound* CompoundNode::compound () const {
-  return compound_;
+inline bool CompoundNode::ok () const {
+  return ok_;
 }
 
 inline auto CompoundNode::begin () const -> decltype(children_.begin()) {

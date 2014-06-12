@@ -18,9 +18,12 @@ using std::endl;
 using std::hash;
 using std::make_pair;
 
-CompoundNode::~CompoundNode () {
-  if (compound_)
-    compound_->release();
+void CompoundNode::Check (const ICompound* the_compound) {
+  if (ok_) return; // TODO throw exception?
+  ok_ = true; // TODO check if names are the same?
+  if (ok_) {
+    type_ = the_compound->kindString()->latin1();
+  }
 }
 
 void CompoundNode::AddChild (const Ptr& the_child) {
@@ -45,7 +48,7 @@ void CompoundNode::AddChild (ICompound* the_child_compound) {
     node = next;
     getline(stream, token, ':');
   }
-  node->set_compound(the_child_compound);
+  node->Check(the_child_compound);
 }
 
 CompoundNode::Ptr CompoundNode::FindChild (const string& the_name) const {
@@ -54,8 +57,8 @@ CompoundNode::Ptr CompoundNode::FindChild (const string& the_name) const {
 }
 
 void CompoundNode::DumpTree (ostream& out, const string& ident) const {
-  string name = compound_ ? name_ : "???";
-  string type = compound_ ? compound_->kindString()->latin1() : "unknown";
+  string name = name_;
+  string type = ok_ ? type_ : "???";
   out << ident << name << " [" << type << "]" << endl;
   for (const auto& child : *this)
     child.second->DumpTree(out, ident+"  ");

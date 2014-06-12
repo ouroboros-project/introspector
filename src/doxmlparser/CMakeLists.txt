@@ -1,6 +1,10 @@
 
 
-set (OP_DOXMLPARSER_CXX_FLAGS -pipe -fsigned-char -D_LARGEFILE_SOURCE -Wall -W -O2)
+set (
+  OP_DOXMLPARSER_CXX_FLAGS
+  -pipe -fsigned-char -D_LARGEFILE_SOURCE
+  ${OP_INTROSPECTOR_CXX_FLAGS}
+)
 
 set (
   OP_DOXMLPARSER_HEADERS
