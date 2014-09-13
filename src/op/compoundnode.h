@@ -34,6 +34,8 @@ class CompoundNode final : public std::enable_shared_from_this<CompoundNode> {
 
     void DumpTree (std::ostream& out, const std::string& ident = "") const;
 
+    void Translate (std::ostream& out, const std::string& ident = "") const;
+
   private:
 
     const std::string name_;

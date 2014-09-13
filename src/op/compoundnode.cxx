@@ -64,6 +64,14 @@ void CompoundNode::DumpTree (ostream& out, const string& ident) const {
     child.second->DumpTree(out, ident+"  ");
 }
 
+void CompoundNode::Translate (ostream& out, const string& ident) const {
+  string name = name_;
+  string type = ok_ ? type_ : "???";
+  out << ident << name << " [" << type << "]" << endl;
+  for (const auto& child : *this)
+    child.second->DumpTree(out, ident+"  ");
+}
+
 } // namespace intro
 } // namespace op
 
